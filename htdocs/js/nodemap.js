@@ -3,6 +3,7 @@
 // 
 // Authors:
 //   Eric Butler <eric@extremeboredom.net>
+//   Claudio Mignanti <c.mignanti@gmail.com>
 //  
 
 
@@ -24,6 +25,83 @@ var goodLinkColor = "#00ff00";
 var medLinkColor = "#ffff00";
 var badLinkColor = "#ee0000";
 
+
+
+function call_data (){
+	var request = GXmlHttp.create ();
+	request.open ('GET', 'data.php?lat='+map.getCenter().lat() +'&lng='+map.getCenter().lng()+'&zoom='+map.getZoom(), true);
+	request.onreadystatechange = function () {
+		if (request.readyState == 4) {
+			var xmlDoc = request.responseXML;
+
+			// Add Nodes
+			var markersFromXml = xmlDoc.documentElement.getElementsByTagName ("nodes")[0].getElementsByTagName ("node");
+			for (var i = 0; i < markersFromXml.length; i++) {
+				var name = markersFromXml[i].getAttribute("name");
+				var base64Name = markersFromXml[i].getAttribute("base64Name");
+				var owner = markersFromXml[i].getAttribute("owner");
+				var desc = markersFromXml[i].getAttribute("description");
+				var ip = markersFromXml[i].getAttribute("ip");
+				var state = markersFromXml[i].getAttribute("state");
+				var lng = parseFloat(markersFromXml[i].getAttribute("lng"));
+				var lat = parseFloat(markersFromXml[i].getAttribute("lat"));
+				var ele = parseFloat(markersFromXml[i].getAttribute("elevation"));
+	
+				var node = new NodeMarker (name, base64Name, owner, desc, ip, state, lng, lat, ele);	
+				markers[node.name] = node;
+			}
+	/*
+			// Add Links
+			var lnks = xmlDoc.documentElement.getElementsByTagName ("links")[0].getElementsByTagName ("link");
+			for (var i = 0; i < lnks.length; i++) {
+				var link = new Object ();
+				link.type = lnks[i].getAttribute("type");
+				link.quality = lnks[i].getAttribute("quality");
+				link.node1 = markers [lnks[i].getAttribute("node1")];
+				link.node2 = markers [lnks[i].getAttribute("node2")];
+				link.point1 = markers [lnks[i].getAttribute("node1")].getPoint();
+				link.point2 = markers [lnks[i].getAttribute("node2")].getPoint();
+				links.push (link);
+
+			
+				// Add local markers
+				//XXX: Move cookie foo to gui.js
+				var markersText = readCookie ("markers");
+				if (markersText != null) {
+					var savedMarkers = markersText.split ('|');
+	
+					for (var i = 0; i < savedMarkers.length; i++) {
+						if (savedMarkers[i] != '') {
+							var markerParameters = savedMarkers[i].split (',');
+							var name = decode64 (markerParameters [0]);
+							if (markers[name] == null) {
+								var y = markerParameters [2];
+								var x = markerParameters [1];
+								var bad = false;
+								for (key in markers) {
+									if (markers[key].getPoint().lng() == x & markers[key].getPoint().lat() == y) {
+										bad = true;
+										break;
+									}
+								}
+		
+								if (bad) { break; }
+								var marker = new NodeMarker (name, encode64(name), '', '', '', '', '', '', 'marker', x, y);
+								markers[marker.name] = marker;
+								markerCount ++;
+							}
+						}
+					}
+				}
+		
+				
+			}*/
+			populateMap();
+		}
+	}
+
+	request.send (null);
+}
 
 function createMap (containerId)
 {
@@ -61,92 +139,15 @@ function createMap (containerId)
 			addMarker (point.lat(), point.lng(), '');
 		}
 	});
+	GEvent.addListener (map, 'moveend', call_data)
 
 	window.addEventListener('DOMMouseScroll', wheelZoom, false);
 	
 	map.enableContinuousZoom();
-	//wap.enableDoubleClickZoom();
-
-	var request = GXmlHttp.create ();
-	request.open ('GET', 'data.php', true);
-	request.onreadystatechange = function () {
-		if (request.readyState == 4) {
-
-			var xmlDoc = request.responseXML;
-
-			// Add Nodes
-			var markersFromXml = xmlDoc.documentElement.getElementsByTagName ("nodes")[0].getElementsByTagName ("node");
-			for (var i = 0; i < markersFromXml.length; i++) {
-
-				var name = markersFromXml[i].getAttribute("name");
-				var base64Name = markersFromXml[i].getAttribute("base64Name");
-				var owner = markersFromXml[i].getAttribute("owner");
-				var desc = markersFromXml[i].getAttribute("description");
-				var ip = markersFromXml[i].getAttribute("ip");
-				var state = markersFromXml[i].getAttribute("state");
-				var lng = parseFloat(markersFromXml[i].getAttribute("lng"));
-				var lat = parseFloat(markersFromXml[i].getAttribute("lat"));
-				var ele = parseFloat(markersFromXml[i].getAttribute("elevation"));
-
-				var node = new NodeMarker (name, base64Name, owner, desc, ip, state, lng, lat, ele);
-
-				markers[node.name] = node;
-			}
-
-			// Add Links
-			var lnks = xmlDoc.documentElement.getElementsByTagName ("links")[0].getElementsByTagName ("link");
-			for (var i = 0; i < lnks.length; i++) {
-				try {
-					var link = new Object ();
-					link.type = lnks[i].getAttribute("type");
-					link.quality = lnks[i].getAttribute("quality");
-					link.node1 = markers [lnks[i].getAttribute("node1")];
-					link.node2 = markers [lnks[i].getAttribute("node2")];
-					link.point1 = markers [lnks[i].getAttribute("node1")].getPoint();
-					link.point2 = markers [lnks[i].getAttribute("node2")].getPoint();
-					links.push (link);
-				} catch (e) {
-					alert ("ERROR WITH LINK: " + lnks[i].getAttribute("node1")  + " <--> " + lnks[i].getAttribute("node2") + ":\n\n" + e);
-				}
-			}
 
 
-			// Add local markers
-			//XXX: Move cookie foo to gui.js
-			var markersText = readCookie ("markers");
-			if (markersText != null) {
-				var savedMarkers = markersText.split ('|');
-				for (var i = 0; i < savedMarkers.length; i++) {
-					if (savedMarkers[i] != '') {
-						var markerParameters = savedMarkers[i].split (',');
-						var name = decode64 (markerParameters [0]);
-						if (markers[name] == null) {
-							var y = markerParameters [2];
-							var x = markerParameters [1];
+	call_data (map)
 
-							var bad = false;
-							for (key in markers) {
-								if (markers[key].getPoint().lng() == x & markers[key].getPoint().lat() == y) {
-									bad = true;
-									break;
-								}
-							}
-
-							if (bad) { break; }
-
-							var marker = new NodeMarker (name, encode64(name), '', '', '', '', '', '', 'marker', x, y);
-							markers[marker.name] = marker;
-							markerCount ++;
-
-						}
-					}
-				}
-			}
-
-			populateMap ();
-		}
-	}
-	request.send (null);
 	return map;
 }
 

@@ -20,17 +20,32 @@ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
 require ("config.php");
 
+
 header ("Content-Type: text/xml");
 $connection = mysql_connect (MYSQL_HOST, MYSQL_USER, MYSQL_PASS) or die ('Could not connect: ' . mysql_error());
 mysql_select_db (MYSQL_DB) or die ('Could not select database.');
 
 echo "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n
-<map>\n
-<nodes>\n";
+<map>\n";
+
+
+/* Calc lat, log delta */
+$lat = $_GET["lat"];
+$lng = $_GET["lng"];
+
+$lat_max =$lat + 0.1;
+$lat_min =$lat - 0.1;
+
+$lng_max = $lng + 0.1;
+$lng_min = $lng - 0.1;
 
 /* Push the nodes */
-$query = "SELECT * FROM " . MYSQL_NODES_TABLE . " WHERE status IN (1, 2, 3) ORDER BY status DESC, nodename";
+$query = "SELECT * FROM " . MYSQL_NODES_TABLE . " WHERE status IN (1, 2, 3) and lng > $lng_min and lng < $lng_max and lat > $lat_min and lat < $lat_max";
 $result = mysql_query ($query, $connection) or die (mysql_error());
+
+//echo "<info>$lat_max:$lat_min</info>";
+
+echo "<nodes>\n";
 
 while ($row = mysql_fetch_assoc($result)) {
 	$name = htmlspecialchars($row['nodeName']);
