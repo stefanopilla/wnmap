@@ -378,34 +378,35 @@ function wheelZoom(event) {
 
 
 
-    function TextControl(text, url) {
+function TextControl(text, url) {
 	this.text = text;
 	this.url = url;
-    }
-    TextControl.prototype = new GControl();
+}
 
-    // Creates a one DIV for each of the buttons and places them in a container
-    // DIV which is returned as our control element. We add the control to
-    // to the map container and return the element for the map class to
-    // position properly.
-    TextControl.prototype.initialize = function(map) {
-      var container = document.createElement("div");
-      var textDiv = document.createElement("div");
-      textDiv.innerHTML = '<a style="color: black;" href="' + this.url + '">' +this.text + '</a>';
-      this.setButtonStyle_(textDiv);
- 	container.appendChild (textDiv);
-      map.getContainer().appendChild(container);
-      return container;
-    }
+TextControl.prototype = new GControl();
 
-    // By default, the control will appear in the top left corner of the
-    // map with 7 pixels of padding.
-    TextControl.prototype.getDefaultPosition = function() {
+// Creates a one DIV for each of the buttons and places them in a container
+// DIV which is returned as our control element. We add the control to
+// to the map container and return the element for the map class to
+// position properly.
+TextControl.prototype.initialize = function(map) {
+	var container = document.createElement("div");
+	var textDiv = document.createElement("div");
+	textDiv.innerHTML = '<a style="color: black;" href="' + this.url + '">' +this.text + '</a>';
+	this.setButtonStyle_(textDiv);
+	container.appendChild (textDiv);
+	map.getContainer().appendChild(container);
+	return container;
+}
+
+// By default, the control will appear in the top left corner of the
+// map with 7 pixels of padding.
+TextControl.prototype.getDefaultPosition = function() {
       return new GControlPosition(G_ANCHOR_TOP_RIGHT, new GSize(7, 7));
-    }
+}
 
-    // Sets the proper CSS for the given button element.
-    TextControl.prototype.setButtonStyle_ = function(button) {
+// Sets the proper CSS for the given button element.
+TextControl.prototype.setButtonStyle_ = function(button) {
       button.style.textDecoration = "underline";
       button.style.color = "#0000cc";
       button.style.backgroundColor = "white";
@@ -416,5 +417,5 @@ function wheelZoom(event) {
       button.style.textAlign = "center";
       button.style.cursor = "pointer";
       button.style.setProperty ("-moz-opacity", "0.5", "");
-    }
+}
 
