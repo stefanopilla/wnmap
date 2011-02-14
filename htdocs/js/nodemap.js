@@ -142,10 +142,6 @@ function createMap (containerId)
 							markers[marker.name] = marker;
 							markerCount ++;
 
-							// If a street address is bundled in the cookie data, add it to the marker object.
-							if (markerParameters [3]) {
-								marker.setStreetAddress (decode64 (markerParameters [3]));
-							}
 						}
 					}
 				}
@@ -264,7 +260,7 @@ function saveMarkers()
 	for (key in markers) {
 		var marker = markers[key];
 		if (marker.state == 'marker') {
-			arr.push(encode64 (marker.name) + ',' + marker.getPoint().lng() + ',' + marker.getPoint().lat() + ',' + encode64 (marker.streetAddress));
+			arr.push(encode64 (marker.name) + ',' + marker.getPoint().lng() + ',' + marker.getPoint().lat());
 		}
 	}
 	value = arr.join("|");
@@ -284,9 +280,8 @@ function getMarker (b64index) {
 	return markers[index];
 }
 
-function addMarker (lat, lng, b64addr) 
+function addMarker (lat, lng) 
 {
-	var streetAddress = decode64 (b64addr);
 
 	showMarkers ();
 
@@ -300,11 +295,6 @@ function addMarker (lat, lng, b64addr)
 	markerCount ++;
 	var newMarkerName = "New Node " + markerCount;
 	var marker = new NodeMarker (newMarkerName, encode64(newMarkerName), '', '', '', '', '', '', 'marker', lng, lat);
-
-	// store the street address if it was passed in
-	if ( streetAddress != '' ) {
-		marker.setStreetAddress (streetAddress);
-	}
 
 	markers[marker.name] = marker;
 	populateMap ();
