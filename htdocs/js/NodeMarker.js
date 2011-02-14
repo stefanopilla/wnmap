@@ -9,8 +9,10 @@
  */
 
 var url;
-var option = "'scrollbars=yes,menubar=no,toolbar=no,status=no,personalbar=no,width=300,height=200'"
 
+function urlmanager (get, h, w, linkname) {
+	return "<a href=\"javascript:void(0);\" onclick=\"window.open ('manager.php?" + get + "', 'Manager', 'scrollbars=yes,menubar=no,toolbar=no,status=no,personalbar=no,width=" + w + " ,height=" + h + "' );\">" + linkname + "</a>";
+}
 function NodeMarker (name, base64name, owner, description, ip, state, lng, lat, ele)
 {
 	this.name = name;
@@ -155,7 +157,7 @@ function NodeMarker (name, base64name, owner, description, ip, state, lng, lat, 
 
 			var owner = document.createElement ("div");
 			owner.innerHTML = "<b>" + WNMAP_OWNER_ + "</b> " + this.owner;
-			owner.innerHTML += " - <a href=\"javascript:void(0);\" onclick=\"window.open ('manager.php?name="+this.name+"&action=contatti', 'Manager',"+option+");\">Contatta</a>;
+			owner.innerHTML += urlmanager ("name="+this.name+"&action=contatti", 200, 300, "Contatta")
 			thing.appendChild (owner);
 
 			var type = document.createElement ("div");
@@ -163,9 +165,9 @@ function NodeMarker (name, base64name, owner, description, ip, state, lng, lat, 
 			type.innerHTML ="<b>" + WNMAP_TYPE_ + "</b> " + this.statePretty;
 			
 			if (state == "potential") {
-				type.innerHTML +=" <a href=\"javascript:void(0);\" onclick=\"window.open ('manager.php?name="+this.name+"&action=status&val=2&ex_val="+this.statePretty+"', 'Manager',"+option+");\">Enable</a> <a href=\"javascript:void(0);\" onclick=\"window.open ('manager.php?name="+this.name+"&action=status&val=3&ex_val="+this.statePretty+"', 'Manager',"+option+");\">Hotspot</a>";
+				type.innerHTML +=urlmanager ("name="+this.name+"&action=status&val=2&ex_val="+this.statePretty, 200, 300, "Enable") + urlmanager ("name="+this.name+"&action=status&val=3&ex_val="+this.statePretty, 200, 300, "Hotspot")
 			} else {
-				type.innerHTML +=" <a href=\"javascript:void(0);\" onclick=\"window.open ('manager.php?name="+this.name+"&action=status&val=1', 'Manager',"+option+");\">Disable</a>";
+				type.innerHTML +=urlmanager ("name="+this.name+"&action=status&val=1", 200, 300, "Disable")
 			}
 			thing.appendChild (type);
 
@@ -187,12 +189,12 @@ function NodeMarker (name, base64name, owner, description, ip, state, lng, lat, 
 		var ip = document.createElement ("div");
 		address.className = "position";
 		address.innerHTML = "<b>" + WNMAP_IP_ + "</b> " + this.ip;
-		address.innerHTML +=" <a href=\"javascript:void(0);\" onclick=\"window.open ('manager.php?name="+this.name+"&action=ip1', 'Manager',"+option+");\">Modifica</a>";
+		address.innerHTML +=urlmanager ("name="+this.name+"&action=ip1", 200, 300, "Modifica")
 		thing.appendChild (ip);
 
 		var manager = document.createElement ("div");
 		manager.className = "position"
-		manager.innerHTML = "<b>Cancella:</b>  <a href=\"javascript:void(0);\" onclick=\"window.open ('manager.php?name="+this.name+"&action=del1', 'Manager',"+option+");\">Cancella nodo</a>" 
+		manager.innerHTML = "<b>Cancella:</b>" + urlmanager ("name="+this.name+"&action=del1", 200, 300, "Cancella nodo")
 		thing.appendChild (manager);
 	
 		return thing;
