@@ -33,11 +33,12 @@ echo "<?xml version=\"1.0\" encoding=\"ISO-8859-1\"?>\n
 $lat = $_GET["lat"];
 $lng = $_GET["lng"];
 
-$lat_max =$lat + 0.1;
-$lat_min =$lat - 0.1;
+$k = 20 - $_GET["zoom"];
+$lat_max =$lat + 0.1 * $k;
+$lat_min =$lat - 0.1 * $k;
 
-$lng_max = $lng + 0.1;
-$lng_min = $lng - 0.1;
+$lng_max = $lng + 0.1 * $k;
+$lng_min = $lng - 0.1 * $k;
 
 /* Push the nodes */
 $query = "SELECT * FROM " . MYSQL_NODES_TABLE . " WHERE status IN (1, 2, 3) and lng > $lng_min and lng < $lng_max and lat > $lat_min and lat < $lat_max";
